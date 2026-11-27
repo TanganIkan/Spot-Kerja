@@ -59,6 +59,34 @@ info ringkas dalam satu baris ikon (`harga · jarak · buka`).
 
 Foto dari Unsplash (lisensi gratis), daftar sumber di `assets/images/spots/CREDITS.md`.
 
+**Tipografi:** Plus Jakarta Sans (SIL Open Font License), di `assets/fonts/`.
+
+**Ikon & splash screen:** pin lokasi putih dengan petir ⚡ (simbol Work Score) di atas
+gradasi oranye. Gambarnya dibuat oleh `tool/generate_brand_assets.py`, lalu
+dipasang ke Android, iOS, dan web lewat `flutter_launcher_icons` dan
+`flutter_native_splash` (lihat bagian *Menjalankan*).
+
+**Onboarding:** 3 layar yang hanya tampil saat app pertama kali dibuka
+(apa itu SpotKerja → cara membaca Work Score → izin lokasi). Izin lokasi baru
+diminta di layar ke-3 setelah user paham alasannya, dan bisa dilewati dengan
+"Nanti saja".
+
+## Atribut lokal (pembeda dari app global)
+
+App sejenis (Workolatte, Twork, Mugg, dll.) dibuat untuk digital nomad global.
+SpotKerja menambahkan hal yang penting bagi pekerja di Indonesia:
+
+| Atribut | Pilihan |
+|---|---|
+| 🚭 Rokok | Bebas rokok · Area rokok terpisah · Boleh merokok |
+| ❄️ Tempat duduk | Indoor ber-AC · Outdoor · Indoor & outdoor |
+| 🏍️ Parkir motor | Mudah · Sulit |
+| ⏱️ Duduk lama | Bebas duduk lama · Ada minimum order · Dibatasi waktu |
+| 🌅 Jam ramai | Pagi · Siang · Sore · Malam (boleh lebih dari satu) |
+
+Semua atribut diisi pengunjung lewat form review (opsional), lalu digabung
+dengan suara terbanyak. Data awal nantinya diisi dari survei sendiri.
+
 ## Batasan (aturan bisnis)
 
 Semua angka di bawah bisa diubah di satu tempat (lihat kolom "Di mana").
@@ -70,6 +98,11 @@ Semua angka di bawah bisa diubah di satu tempat (lihat kolom "Di mana").
 | Filter "WiFi cepat" | speed test terbaru ≥ 25 Mbps | `models/spot_filter.dart` |
 | Filter "Banyak colokan" / "Tenang" | rata-rata rating ≥ 4.0 | `models/spot_filter.dart` |
 | Filter "Buka malam" | tutup jam 22.00 atau lebih | `models/spot.dart` |
+| Atribut lokal (rokok, tempat duduk, parkir motor, duduk lama) | suara terbanyak dari review, berbobot kebaruan; kalau seri, jawaban terbaru menang | `models/place_facts.dart` |
+| Jam ramai | ditampilkan kalau dilaporkan oleh ≥ 50% (berbobot) yang menjawab | `models/place_facts.dart` |
+| Filter "Bebas rokok" | bebas rokok **atau** area rokok terpisah (ada ruangan tanpa asap) | `models/place_facts.dart` |
+| Filter "Ber-AC" / "Parkir motor" / "Boleh duduk lama" | indoor ber-AC atau indoor & outdoor / parkir mudah / bebas duduk lama | `models/place_facts.dart` |
+| Spot tanpa info atribut lokal | tidak lolos filter atribut lokal (tidak diasumsikan) | `models/spot_filter.dart` |
 | Check-in terverifikasi | posisi user ≤ 200 m dari spot saat kirim review | `state/spot_store.dart` |
 | Anti-spam | 1 review per spot per hari per user | `state/spot_store.dart` |
 | Data keramaian "basi" | dilaporkan > 3 jam lalu → diberi keterangan "mungkin sudah berubah" | `screens/spot_detail_screen.dart` |
@@ -118,14 +151,26 @@ dilakukan di satu file.
 ```bash
 flutter pub get
 flutter run -d chrome      # preview di browser
-flutter test               # unit test logika Work Score & filter
+flutter test               # unit test + widget test alur utama & onboarding
 ```
+
+Membuat ulang ikon & splash screen setelah mengubah desainnya:
+
+```bash
+python3 tool/generate_brand_assets.py      # butuh: pip install pillow
+dart run flutter_launcher_icons
+dart run flutter_native_splash:create
+```
+
+Melihat onboarding lagi di browser: hapus data situs `localhost:8080`
+(DevTools → Application → Clear site data), lalu muat ulang.
 
 Untuk iOS Simulator, install Xcode dulu dari App Store, lalu `flutter run`.
 
 ## Roadmap
 
-1. **v0.1 (sekarang)**: list, peta, filter, detail, Work Score, review, favorit
+1. **v0.1 (sekarang)**: beranda, peta, filter, detail, Work Score, review, tersimpan,
+   desain baru, font, ikon, splash screen, onboarding
 2. **v0.2**: Supabase (auth + database + PostGIS untuk query "spot dalam radius X")
 3. **v0.3**: speed test otomatis, upload foto, tambah spot baru
 4. **v0.4**: seed data nyata dari OpenStreetMap (Overpass API), marker clustering

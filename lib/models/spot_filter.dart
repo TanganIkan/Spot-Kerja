@@ -20,6 +20,10 @@ class SpotFilter {
     this.quiet = false,
     this.openLate = false,
     this.openNow = false,
+    this.smokeFree = false,
+    this.airConditioned = false,
+    this.motorParking = false,
+    this.longStay = false,
     this.sortBy = SortBy.distance,
   });
 
@@ -28,9 +32,26 @@ class SpotFilter {
   final bool quiet;
   final bool openLate;
   final bool openNow;
+
+  // Atribut lokal
+  /// Ada ruangan tanpa asap rokok (bebas rokok / area rokok terpisah).
+  final bool smokeFree;
+  final bool airConditioned;
+  final bool motorParking;
+  final bool longStay;
+
   final SortBy sortBy;
 
-  bool get isActive => fastWifi || manyOutlets || quiet || openLate || openNow;
+  bool get isActive =>
+      fastWifi ||
+      manyOutlets ||
+      quiet ||
+      openLate ||
+      openNow ||
+      smokeFree ||
+      airConditioned ||
+      motorParking ||
+      longStay;
 
   bool matches(Spot spot, SpotStats stats, DateTime now) {
     if (fastWifi &&
@@ -41,6 +62,11 @@ class SpotFilter {
     if (quiet && stats.quiet < FilterThresholds.goodRating) return false;
     if (openLate && !spot.opensLate) return false;
     if (openNow && !spot.isOpenAt(now)) return false;
+    final facts = stats.facts;
+    if (smokeFree && !facts.hasSmokeFreeRoom) return false;
+    if (airConditioned && !facts.hasAc) return false;
+    if (motorParking && facts.motorParking != true) return false;
+    if (longStay && !facts.allowsLongStay) return false;
     return true;
   }
 
@@ -50,6 +76,10 @@ class SpotFilter {
     bool? quiet,
     bool? openLate,
     bool? openNow,
+    bool? smokeFree,
+    bool? airConditioned,
+    bool? motorParking,
+    bool? longStay,
     SortBy? sortBy,
   }) =>
       SpotFilter(
@@ -58,6 +88,10 @@ class SpotFilter {
         quiet: quiet ?? this.quiet,
         openLate: openLate ?? this.openLate,
         openNow: openNow ?? this.openNow,
+        smokeFree: smokeFree ?? this.smokeFree,
+        airConditioned: airConditioned ?? this.airConditioned,
+        motorParking: motorParking ?? this.motorParking,
+        longStay: longStay ?? this.longStay,
         sortBy: sortBy ?? this.sortBy,
       );
 

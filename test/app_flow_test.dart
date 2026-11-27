@@ -6,6 +6,7 @@ import 'package:spot_kerja/data/dummy_spot_repository.dart';
 import 'package:spot_kerja/data/local_storage.dart';
 import 'package:spot_kerja/main.dart';
 import 'package:spot_kerja/screens/home_screen.dart';
+import 'package:spot_kerja/screens/review_form_screen.dart';
 import 'package:spot_kerja/services/location_service.dart';
 import 'package:spot_kerja/state/favorites_store.dart';
 import 'package:spot_kerja/state/spot_store.dart';
@@ -84,8 +85,18 @@ void main() {
       await tester.tap(star);
       await tester.pump();
     }
+    // Form cukup panjang: scroll sampai tombol kirim ter-render.
     final submit = find.text('Kirim review');
-    await tester.ensureVisible(submit);
+    await tester.scrollUntilVisible(
+      submit,
+      300,
+      scrollable: find
+          .descendant(
+            of: find.byType(ReviewFormScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
     await tester.tap(submit);
     await tester.pump(LocationService.timeout + const Duration(seconds: 1));
     await settle();

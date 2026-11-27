@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../data/spot_repository.dart';
+import '../models/place_facts.dart';
 import '../models/review.dart';
 import '../models/spot.dart';
 import '../models/spot_filter.dart';
@@ -49,7 +50,9 @@ class SpotStore extends ChangeNotifier {
 
   // ---- Load data --------------------------------------------------------
 
-  Future<void> load() async {
+  /// Muat data spot & review. [locate] = false kalau izin lokasi belum
+  /// boleh diminta (misalnya user belum melewati onboarding).
+  Future<void> load({bool locate = true}) async {
     isLoading = true;
     error = null;
     notifyListeners();
@@ -66,7 +69,7 @@ class SpotStore extends ChangeNotifier {
     }
     isLoading = false;
     notifyListeners();
-    await refreshLocation();
+    if (locate) await refreshLocation();
   }
 
   Future<void> refreshLocation() async {
@@ -164,6 +167,11 @@ class SpotStore extends ChangeNotifier {
     required CrowdLevel crowd,
     double? wifiSpeedMbps,
     String comment = '',
+    SmokingPolicy? smoking,
+    Seating? seating,
+    bool? motorParking,
+    StayPolicy? stay,
+    Set<BusyTime> busyTimes = const {},
   }) async {
     if (hasReachedReviewLimit(spotId)) return ReviewResult.limitReached;
     final spot = spotById(spotId);
@@ -188,6 +196,11 @@ class SpotStore extends ChangeNotifier {
       createdAt: DateTime.now(),
       verifiedCheckIn: verified,
       isMine: true,
+      smoking: smoking,
+      seating: seating,
+      motorParking: motorParking,
+      stay: stay,
+      busyTimes: busyTimes,
     );
 
     await _repository.addReview(review);

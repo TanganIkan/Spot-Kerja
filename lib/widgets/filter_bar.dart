@@ -52,6 +52,15 @@ class FilterBar extends StatelessWidget {
           (v) => f.copyWith(openNow: v)),
       chip('Buka malam', Icons.nightlight_outlined, f.openLate,
           (v) => f.copyWith(openLate: v)),
+      // Atribut lokal
+      chip('Bebas rokok', Icons.smoke_free_rounded, f.smokeFree,
+          (v) => f.copyWith(smokeFree: v)),
+      chip('Ber-AC', Icons.ac_unit_rounded, f.airConditioned,
+          (v) => f.copyWith(airConditioned: v)),
+      chip('Parkir motor', Icons.two_wheeler_rounded, f.motorParking,
+          (v) => f.copyWith(motorParking: v)),
+      chip('Boleh duduk lama', Icons.hourglass_bottom_rounded, f.longStay,
+          (v) => f.copyWith(longStay: v)),
     ];
 
     if (wrap) {
@@ -136,7 +145,7 @@ Future<void> showFilterSheet(BuildContext context) {
               const SizedBox(height: 8),
               const SortSelector(),
               const SizedBox(height: 20),
-              const Text('Fasilitas & jam buka',
+              const Text('Fasilitas, aturan & jam buka',
                   style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               const FilterBar(wrap: true),

@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../models/place_facts.dart';
 import '../models/review.dart';
 import '../models/spot.dart';
 import '../models/spot_stats.dart';
@@ -96,6 +97,9 @@ class SpotDetailScreen extends StatelessWidget {
                 _WorkScoreCard(stats: stats),
                 const SizedBox(height: 12),
                 _LiveStats(stats: stats),
+                const SizedBox(height: 28),
+                const _SectionTitle('Fasilitas & aturan'),
+                _PlaceFactsSection(facts: stats.facts),
                 const SizedBox(height: 28),
                 const _SectionTitle('Lokasi'),
                 _MiniMap(spot: spot, stats: stats),
@@ -644,4 +648,211 @@ class _MiniRating extends StatelessWidget {
           style: const TextStyle(fontSize: 12, color: AppColors.ink),
         ),
       );
+}
+
+/// Atribut lokal: rokok, tempat duduk, parkir motor, duduk lama, jam ramai.
+class _PlaceFactsSection extends StatelessWidget {
+  const _PlaceFactsSection({required this.facts});
+
+  final PlaceFacts facts;
+
+  @override
+  Widget build(BuildContext context) {
+    final parking = switch (facts.motorParking) {
+      true => 'Mudah',
+      false => 'Sulit',
+      null => null,
+    };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final tileWidth = (constraints.maxWidth - 12) / 2;
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _FactTile(
+                  width: tileWidth,
+                  icon: Icons.smoke_free_rounded,
+                  label: 'Rokok',
+                  value: facts.smoking?.label,
+                  good: facts.hasSmokeFreeRoom,
+                ),
+                _FactTile(
+                  width: tileWidth,
+                  icon: Icons.ac_unit_rounded,
+                  label: 'Tempat duduk',
+                  value: facts.seating?.label,
+                  good: facts.hasAc,
+                ),
+                _FactTile(
+                  width: tileWidth,
+                  icon: Icons.two_wheeler_rounded,
+                  label: 'Parkir motor',
+                  value: parking,
+                  good: facts.motorParking == true,
+                ),
+                _FactTile(
+                  width: tileWidth,
+                  icon: Icons.hourglass_bottom_rounded,
+                  label: 'Duduk lama',
+                  value: facts.stay?.label,
+                  good: facts.allowsLongStay,
+                ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceSoft,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.groups_outlined,
+                      size: 20, color: AppColors.primaryText),
+                  SizedBox(width: 10),
+                  Text('Biasanya ramai',
+                      style: TextStyle(fontSize: 13, color: AppColors.muted)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: facts.busyTimes.isEmpty
+                    ? const Text('Belum ada info',
+                        style: TextStyle(color: AppColors.muted))
+                    : Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                          for (final t in BusyTime.values)
+                            if (facts.busyTimes.contains(t))
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.sand.withValues(alpha: 0.6),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(t.icon,
+                                        size: 14,
+                                        color: AppColors.primaryText),
+                                    const SizedBox(width: 4),
+                                    Text(t.label,
+                                        style: const TextStyle(
+                                            fontSize: 12.5,
+                                            fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+                        ],
+                      ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          facts.hasData
+              ? 'Berdasarkan ${facts.reportCount} laporan pengunjung · suara terbanyak, '
+                  'laporan terbaru berbobot lebih besar'
+              : 'Belum ada laporan. Bantu isi lewat Check-in & Review.',
+          style: const TextStyle(fontSize: 12, color: AppColors.muted),
+        ),
+      ],
+    );
+  }
+}
+
+class _FactTile extends StatelessWidget {
+  const _FactTile({
+    required this.width,
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.good,
+  });
+
+  final double width;
+  final IconData icon;
+  final String label;
+
+  /// null = belum ada info.
+  final String? value;
+
+  /// True kalau nilainya "positif" untuk pekerja (ikon diberi warna hijau).
+  final bool good;
+
+  @override
+  Widget build(BuildContext context) {
+    final known = value != null;
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: !known
+                  ? AppColors.surfaceSoft
+                  : good
+                      ? AppColors.success.withValues(alpha: 0.12)
+                      : AppColors.sand.withValues(alpha: 0.6),
+            ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: !known
+                  ? AppColors.muted
+                  : good
+                      ? AppColors.success
+                      : AppColors.primaryText,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    style:
+                        const TextStyle(fontSize: 11.5, color: AppColors.muted)),
+                Text(
+                  value ?? 'Belum ada info',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: known ? FontWeight.w600 : FontWeight.w400,
+                    color: known ? AppColors.ink : AppColors.muted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

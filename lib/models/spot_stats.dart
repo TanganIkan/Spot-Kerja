@@ -1,3 +1,4 @@
+import 'place_facts.dart';
 import 'review.dart';
 
 /// Ringkasan kondisi sebuah spot yang dihitung dari semua review-nya.
@@ -18,6 +19,7 @@ class SpotStats {
     this.latestCrowdAt,
     this.wifiSpeedMbps,
     this.wifiMeasuredAt,
+    this.facts = PlaceFacts.empty,
   });
 
   static const empty = SpotStats(
@@ -41,6 +43,9 @@ class SpotStats {
   /// Hasil speed test terbaru.
   final double? wifiSpeedMbps;
   final DateTime? wifiMeasuredAt;
+
+  /// Atribut lokal (rokok, AC, parkir, duduk lama, jam ramai).
+  final PlaceFacts facts;
 
   bool get hasData => reviewCount > 0;
 
@@ -88,6 +93,18 @@ class SpotStats {
       latestCrowdAt: latest.createdAt,
       wifiSpeedMbps: latestSpeed?.wifiSpeedMbps,
       wifiMeasuredAt: latestSpeed?.createdAt,
+      facts: PlaceFacts.fromAnswers([
+        for (final r in reviews)
+          FactAnswer(
+            weight: recencyWeight(now.difference(r.createdAt)),
+            createdAt: r.createdAt,
+            smoking: r.smoking,
+            seating: r.seating,
+            motorParking: r.motorParking,
+            stay: r.stay,
+            busyTimes: r.busyTimes,
+          ),
+      ]),
     );
   }
 }

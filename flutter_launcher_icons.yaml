@@ -1,0 +1,14 @@
+# Generate ikon app: dart run flutter_launcher_icons
+# Sumber gambar dibuat oleh tool/generate_brand_assets.py
+flutter_launcher_icons:
+  image_path: "assets/branding/app_icon.png"
+  android: "launcher_icon"
+  adaptive_icon_background: "#EE6200"
+  adaptive_icon_foreground: "assets/branding/app_icon_foreground.png"
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/branding/app_icon.png"
+    background_color: "#FFFFFF"
+    theme_color: "#EE6200"

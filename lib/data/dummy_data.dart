@@ -1,5 +1,6 @@
 import 'package:latlong2/latlong.dart';
 
+import '../models/place_facts.dart';
 import '../models/review.dart';
 import '../models/spot.dart';
 
@@ -157,6 +158,11 @@ List<Review> buildDummyReviews(DateTime now) {
     required CrowdLevel crowd,
     double? speed,
     String comment = '',
+    SmokingPolicy? smoking,
+    Seating? seating,
+    bool? parking,
+    StayPolicy? stay,
+    Set<BusyTime> busy = const {},
   }) =>
       Review(
         id: 'seed-${counter++}',
@@ -171,29 +177,34 @@ List<Review> buildDummyReviews(DateTime now) {
         comment: comment,
         createdAt: now.subtract(ago),
         verifiedCheckIn: true,
+        smoking: smoking,
+        seating: seating,
+        motorParking: parking,
+        stay: stay,
+        busyTimes: busy,
       );
 
   const h = Duration(hours: 1);
   const d = Duration(days: 1);
 
   return [
-    r('s1', h * 5, 'Dimas', wifi: 5, power: 5, quiet: 4, comfort: 4, crowd: CrowdLevel.sedang, speed: 48, comment: 'Lantai dua enak buat kerja seharian, colokan di tiap meja.'),
+    r('s1', h * 5, 'Dimas', wifi: 5, power: 5, quiet: 4, comfort: 4, crowd: CrowdLevel.sedang, speed: 48, smoking: SmokingPolicy.smokeFree, seating: Seating.indoorAc, parking: true, stay: StayPolicy.unlimited, busy: {BusyTime.siang}, comment: 'Lantai dua enak buat kerja seharian, colokan di tiap meja.'),
     r('s1', d * 3, 'Ayu', wifi: 4, power: 5, quiet: 4, comfort: 5, crowd: CrowdLevel.sepi, speed: 42, comment: 'Kursinya nyaman, cocok buat sesi panjang.'),
     r('s1', d * 40, 'Rizky', wifi: 4, power: 4, quiet: 3, comfort: 4, crowd: CrowdLevel.ramai, comment: 'Weekend lumayan ramai.'),
-    r('s2', h * 2, 'Nadia', wifi: 4, power: 3, quiet: 4, comfort: 5, crowd: CrowdLevel.sedang, speed: 35, comment: 'Interior cantik, tapi colokan terbatas.'),
+    r('s2', h * 2, 'Nadia', wifi: 4, power: 3, quiet: 4, comfort: 5, crowd: CrowdLevel.sedang, speed: 35, smoking: SmokingPolicy.separateArea, seating: Seating.both, parking: false, stay: StayPolicy.minimumOrder, busy: {BusyTime.pagi, BusyTime.siang}, comment: 'Interior cantik, tapi colokan terbatas.'),
     r('s2', d * 10, 'Bima', wifi: 5, power: 2, quiet: 4, comfort: 5, crowd: CrowdLevel.sepi, speed: 55, comment: 'WiFi kencang, siapkan powerbank.'),
-    r('s3', h * 1, 'Sari', wifi: 3, power: 4, quiet: 2, comfort: 3, crowd: CrowdLevel.ramai, speed: 12, comment: 'Murah dan buka malam, tapi berisik.'),
+    r('s3', h * 1, 'Sari', wifi: 3, power: 4, quiet: 2, comfort: 3, crowd: CrowdLevel.ramai, speed: 12, smoking: SmokingPolicy.allowed, seating: Seating.outdoor, parking: true, stay: StayPolicy.unlimited, busy: {BusyTime.sore, BusyTime.malam}, comment: 'Murah dan buka malam, tapi berisik.'),
     r('s3', d * 6, 'Andre', wifi: 3, power: 4, quiet: 3, comfort: 3, crowd: CrowdLevel.ramai, speed: 15, comment: 'Oke untuk kerja ringan.'),
-    r('s4', h * 20, 'Putri', wifi: 4, power: 4, quiet: 5, comfort: 4, crowd: CrowdLevel.sepi, speed: 30, comment: 'Paling tenang di area ini, aman buat video call.'),
+    r('s4', h * 20, 'Putri', wifi: 4, power: 4, quiet: 5, comfort: 4, crowd: CrowdLevel.sepi, speed: 30, smoking: SmokingPolicy.smokeFree, seating: Seating.indoorAc, parking: true, stay: StayPolicy.unlimited, busy: {BusyTime.siang}, comment: 'Paling tenang di area ini, aman buat video call.'),
     r('s4', d * 12, 'Fajar', wifi: 4, power: 5, quiet: 5, comfort: 4, crowd: CrowdLevel.sepi, speed: 28, comment: 'Ada ruang khusus tanpa musik.'),
     r('s4', d * 100, 'Lina', wifi: 3, power: 4, quiet: 5, comfort: 3, crowd: CrowdLevel.sepi, comment: 'Dulu WiFi sering putus, semoga sudah membaik.'),
-    r('s5', h * 4, 'Yoga', wifi: 5, power: 5, quiet: 3, comfort: 4, crowd: CrowdLevel.sedang, speed: 60, comment: 'Ada stopkontak di bawah setiap meja.'),
+    r('s5', h * 4, 'Yoga', wifi: 5, power: 5, quiet: 3, comfort: 4, crowd: CrowdLevel.sedang, speed: 60, smoking: SmokingPolicy.smokeFree, seating: Seating.indoorAc, parking: true, stay: StayPolicy.unlimited, busy: {BusyTime.siang}, comment: 'Ada stopkontak di bawah setiap meja.'),
     r('s5', d * 2, 'Tika', wifi: 5, power: 4, quiet: 3, comfort: 4, crowd: CrowdLevel.ramai, speed: 52, comment: 'Siang hari penuh, datang pagi.'),
-    r('s6', h * 9, 'Arif', wifi: 3, power: 3, quiet: 2, comfort: 2, crowd: CrowdLevel.sedang, speed: 18, comment: 'Penyelamat deadline tengah malam.'),
+    r('s6', h * 9, 'Arif', wifi: 3, power: 3, quiet: 2, comfort: 2, crowd: CrowdLevel.sedang, speed: 18, smoking: SmokingPolicy.allowed, seating: Seating.both, parking: true, stay: StayPolicy.unlimited, busy: {BusyTime.malam}, comment: 'Penyelamat deadline tengah malam.'),
     r('s6', d * 25, 'Mega', wifi: 2, power: 3, quiet: 3, comfort: 2, crowd: CrowdLevel.sepi, speed: 9, comment: 'WiFi lemot di jam sibuk.'),
-    r('s7', h * 30, 'Hendra', wifi: 4, power: 4, quiet: 4, comfort: 4, crowd: CrowdLevel.sepi, speed: 25, comment: 'Adem kalau sore.'),
-    r('s8', d * 7, 'Citra', wifi: 4, power: 2, quiet: 3, comfort: 4, crowd: CrowdLevel.sedang, speed: 40, comment: 'Kopinya juara, tapi tutup sore.'),
+    r('s7', h * 30, 'Hendra', wifi: 4, power: 4, quiet: 4, comfort: 4, crowd: CrowdLevel.sepi, speed: 25, smoking: SmokingPolicy.separateArea, seating: Seating.outdoor, parking: true, stay: StayPolicy.unlimited, busy: {BusyTime.sore}, comment: 'Adem kalau sore.'),
+    r('s8', d * 7, 'Citra', wifi: 4, power: 2, quiet: 3, comfort: 4, crowd: CrowdLevel.sedang, speed: 40, smoking: SmokingPolicy.smokeFree, seating: Seating.indoorAc, parking: false, stay: StayPolicy.timeLimited, busy: {BusyTime.pagi}, comment: 'Kopinya juara, tapi tutup sore.'),
     r('s8', d * 60, 'Joko', wifi: 4, power: 2, quiet: 3, comfort: 3, crowd: CrowdLevel.sedang, comment: 'Colokan sedikit.'),
-    r('s9', d * 15, 'Wulan', wifi: 3, power: 2, quiet: 4, comfort: 3, crowd: CrowdLevel.sepi, speed: 14, comment: 'Enak buat kerja pagi sebelum ramai.'),
+    r('s9', d * 15, 'Wulan', wifi: 3, power: 2, quiet: 4, comfort: 3, crowd: CrowdLevel.sepi, speed: 14, smoking: SmokingPolicy.separateArea, seating: Seating.both, parking: true, stay: StayPolicy.minimumOrder, busy: {BusyTime.pagi}, comment: 'Enak buat kerja pagi sebelum ramai.'),
   ];
 }

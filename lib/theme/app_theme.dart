@@ -34,6 +34,9 @@ class AppSpacing {
 }
 
 class AppTheme {
+  /// Font utama (geometris, dari assets/fonts).
+  static const fontFamily = 'PlusJakartaSans';
+
   static ThemeData get light {
     final scheme = ColorScheme.fromSeed(seedColor: AppColors.primary).copyWith(
       primary: AppColors.primary,
@@ -59,7 +62,11 @@ class AppTheme {
       labelLarge: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
     );
 
-    final base = ThemeData(useMaterial3: true, colorScheme: scheme);
+    final base = ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      fontFamily: fontFamily,
+    );
 
     return base.copyWith(
       scaffoldBackgroundColor: AppColors.surface,

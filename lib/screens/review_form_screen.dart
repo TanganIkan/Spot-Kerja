@@ -1,8 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
+import '../models/place_facts.dart';
 import '../models/review.dart';
 import '../state/spot_store.dart';
+import '../theme/app_theme.dart';
+import '../widgets/choice_group.dart';
 import '../widgets/rating_input.dart';
 
 /// Form check-in & review untuk satu spot.
@@ -21,6 +24,13 @@ class ReviewFormScreen extends StatefulWidget {
 class _ReviewFormScreenState extends State<ReviewFormScreen> {
   int _wifi = 0, _power = 0, _quiet = 0, _comfort = 0;
   CrowdLevel _crowd = CrowdLevel.sedang;
+
+  // Atribut lokal (opsional)
+  SmokingPolicy? _smoking;
+  Seating? _seating;
+  bool? _motorParking;
+  StayPolicy? _stay;
+  Set<BusyTime> _busyTimes = {};
   final _speedController = TextEditingController();
   final _commentController = TextEditingController();
   bool _submitting = false;
@@ -64,6 +74,11 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
       crowd: _crowd,
       wifiSpeedMbps: speed,
       comment: _commentController.text,
+      smoking: _smoking,
+      seating: _seating,
+      motorParking: _motorParking,
+      stay: _stay,
+      busyTimes: _busyTimes,
     );
     if (!mounted) return;
     setState(() => _submitting = false);
@@ -155,7 +170,54 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
               suffixText: 'Mbps',
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 28),
+          Text('Info tempat', style: theme.textTheme.titleMedium),
+          const Text(
+            'Opsional. Isi yang kamu tahu saja, dan tap lagi untuk membatalkan.',
+            style: TextStyle(color: AppColors.muted, fontSize: 13),
+          ),
+          const SizedBox(height: 4),
+          ChoiceGroup<SmokingPolicy>(
+            icon: Icons.smoke_free_rounded,
+            label: 'Rokok',
+            options: SmokingPolicy.values,
+            labelOf: (v) => v.label,
+            selected: _smoking,
+            onChanged: (v) => setState(() => _smoking = v),
+          ),
+          ChoiceGroup<Seating>(
+            icon: Icons.ac_unit_rounded,
+            label: 'Tempat duduk',
+            options: Seating.values,
+            labelOf: (v) => v.label,
+            selected: _seating,
+            onChanged: (v) => setState(() => _seating = v),
+          ),
+          ChoiceGroup<bool>(
+            icon: Icons.two_wheeler_rounded,
+            label: 'Parkir motor mudah?',
+            options: const [true, false],
+            labelOf: (v) => v ? 'Ya' : 'Tidak',
+            selected: _motorParking,
+            onChanged: (v) => setState(() => _motorParking = v),
+          ),
+          ChoiceGroup<StayPolicy>(
+            icon: Icons.hourglass_bottom_rounded,
+            label: 'Boleh kerja lama?',
+            options: StayPolicy.values,
+            labelOf: (v) => v.label,
+            selected: _stay,
+            onChanged: (v) => setState(() => _stay = v),
+          ),
+          MultiChoiceGroup<BusyTime>(
+            icon: Icons.groups_outlined,
+            label: 'Biasanya ramai kapan?',
+            options: BusyTime.values,
+            labelOf: (v) => v.label,
+            selected: _busyTimes,
+            onChanged: (v) => setState(() => _busyTimes = v),
+          ),
+          const SizedBox(height: 20),
           TextField(
             controller: _commentController,
             maxLines: 3,

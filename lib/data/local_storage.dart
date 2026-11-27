@@ -12,6 +12,12 @@ class LocalStorage {
 
   static const _favoritesKey = 'favorites';
   static const _reviewsKey = 'user_reviews';
+  static const _onboardingKey = 'onboarding_done';
+
+  /// True kalau user sudah pernah menyelesaikan onboarding.
+  bool get onboardingDone => _prefs.getBool(_onboardingKey) ?? false;
+
+  Future<void> setOnboardingDone() => _prefs.setBool(_onboardingKey, true);
 
   Set<String> loadFavorites() =>
       (_prefs.getStringList(_favoritesKey) ?? const []).toSet();

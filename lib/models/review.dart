@@ -1,3 +1,5 @@
+import 'place_facts.dart';
+
 /// Tingkat keramaian yang dilaporkan user saat check-in.
 enum CrowdLevel { sepi, sedang, ramai }
 
@@ -28,6 +30,11 @@ class Review {
     this.wifiSpeedMbps,
     this.verifiedCheckIn = false,
     this.isMine = false,
+    this.smoking,
+    this.seating,
+    this.motorParking,
+    this.stay,
+    this.busyTimes = const {},
   });
 
   final String id;
@@ -59,6 +66,13 @@ class Review {
   /// True kalau review ini dibuat oleh user di perangkat ini.
   final bool isMine;
 
+  // ---- Atribut lokal (opsional, null = tidak diisi) ----
+  final SmokingPolicy? smoking;
+  final Seating? seating;
+  final bool? motorParking;
+  final StayPolicy? stay;
+  final Set<BusyTime> busyTimes;
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'spotId': spotId,
@@ -73,6 +87,11 @@ class Review {
         'wifiSpeedMbps': wifiSpeedMbps,
         'verifiedCheckIn': verifiedCheckIn,
         'isMine': isMine,
+        'smoking': smoking?.name,
+        'seating': seating?.name,
+        'motorParking': motorParking,
+        'stay': stay?.name,
+        'busyTimes': busyTimes.map((t) => t.name).toList(),
       };
 
   factory Review.fromJson(Map<String, dynamic> json) => Review(
@@ -89,5 +108,22 @@ class Review {
         wifiSpeedMbps: (json['wifiSpeedMbps'] as num?)?.toDouble(),
         verifiedCheckIn: json['verifiedCheckIn'] as bool? ?? false,
         isMine: json['isMine'] as bool? ?? false,
+        // Field di bawah tidak ada di review versi lama -> null / kosong.
+        smoking: _enumOrNull(SmokingPolicy.values, json['smoking']),
+        seating: _enumOrNull(Seating.values, json['seating']),
+        motorParking: json['motorParking'] as bool?,
+        stay: _enumOrNull(StayPolicy.values, json['stay']),
+        busyTimes: {
+          for (final name in (json['busyTimes'] as List<dynamic>? ?? const []))
+            ?_enumOrNull(BusyTime.values, name),
+        },
       );
+
+  static T? _enumOrNull<T extends Enum>(List<T> values, Object? name) {
+    if (name is! String) return null;
+    for (final v in values) {
+      if (v.name == name) return v;
+    }
+    return null;
+  }
 }
