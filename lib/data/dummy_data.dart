@@ -1,0 +1,199 @@
+import 'package:latlong2/latlong.dart';
+
+import '../models/review.dart';
+import '../models/spot.dart';
+
+// DATA CONTOH: nama tempat dan review di bawah ini fiktif.
+// Lokasinya disebar di area Jakarta Selatan hanya sebagai contoh.
+// Foto dari Unsplash, lihat assets/images/spots/CREDITS.md.
+
+String _photo(String name) => 'assets/images/spots/$name.jpg';
+
+final dummySpots = <Spot>[
+  Spot(
+    id: 's1',
+    category: SpotCategory.coworking,
+    photos: [_photo('s1'), _photo('g2'), _photo('g1')],
+    name: 'Kopi Senja Workspace',
+    area: 'Kemang',
+    address: 'Jl. Contoh Kemang No. 12',
+    location: LatLng(-6.2607, 106.8135),
+    openHour: 8,
+    closeHour: 22,
+    priceLevel: 2,
+    description: 'Kafe dua lantai dengan lantai atas yang khusus untuk kerja. Meja panjang, colokan di setiap meja, dan pencahayaan alami yang terang. Cocok untuk sesi kerja seharian.',
+  ),
+  Spot(
+    id: 's2',
+    category: SpotCategory.kafe,
+    photos: [_photo('s2'), _photo('g3'), _photo('g4')],
+    name: 'Ruang Seduh',
+    area: 'Senopati',
+    address: 'Jl. Contoh Senopati No. 5',
+    location: LatLng(-6.2321, 106.8090),
+    openHour: 7,
+    closeHour: 21,
+    priceLevel: 3,
+    description: 'Kafe bergaya minimalis dengan jendela besar dan banyak cahaya alami. Suasananya tenang di pagi hari, tapi colokan terbatas, jadi bawa powerbank.',
+  ),
+  Spot(
+    id: 's3',
+    category: SpotCategory.kafe,
+    photos: [_photo('s3'), _photo('g4'), _photo('g1')],
+    name: 'Kedai Fokus',
+    area: 'Blok M',
+    address: 'Jl. Contoh Blok M No. 8',
+    location: LatLng(-6.2443, 106.7990),
+    openHour: 9,
+    closeHour: 23,
+    priceLevel: 1,
+    description: 'Kafe ramah kantong yang buka sampai malam. Ramai mahasiswa, jadi lebih cocok untuk kerja ringan atau diskusi kelompok daripada video call.',
+  ),
+  Spot(
+    id: 's4',
+    category: SpotCategory.kafe,
+    photos: [_photo('s4'), _photo('g1'), _photo('g3')],
+    name: 'Sudut Tenang Coffee',
+    area: 'Gandaria',
+    address: 'Jl. Contoh Gandaria No. 21',
+    location: LatLng(-6.2440, 106.7835),
+    openHour: 8,
+    closeHour: 20,
+    priceLevel: 2,
+    description: 'Punya ruang khusus tanpa musik yang aman untuk video call dan kerja fokus. Kursi sofa yang empuk, banyak tanaman, dan suasana yang tenang sepanjang hari.',
+  ),
+  Spot(
+    id: 's5',
+    category: SpotCategory.coworking,
+    photos: [_photo('s5'), _photo('g2'), _photo('g4')],
+    name: 'Laptop & Latte',
+    area: 'Cipete',
+    address: 'Jl. Contoh Cipete No. 3',
+    location: LatLng(-6.2690, 106.7980),
+    openHour: 7,
+    closeHour: 22,
+    priceLevel: 2,
+    description: 'Didesain khusus untuk remote worker: stopkontak di bawah setiap meja, WiFi kencang, dan area duduk yang luas. Siang hari cepat penuh, jadi sebaiknya datang pagi.',
+  ),
+  Spot(
+    id: 's6',
+    category: SpotCategory.kafe,
+    photos: [_photo('s6'), _photo('g3'), _photo('g1')],
+    name: 'Kopi Kilat 24 Jam',
+    area: 'Tebet',
+    address: 'Jl. Contoh Tebet No. 40',
+    location: LatLng(-6.2260, 106.8470),
+    openHour: 0,
+    closeHour: 24,
+    priceLevel: 1,
+    description: 'Buka 24 jam, jadi selalu ada tempat untuk mengejar deadline tengah malam. WiFi bisa melambat di jam sibuk, tapi harganya paling bersahabat.',
+  ),
+  Spot(
+    id: 's7',
+    category: SpotCategory.coworking,
+    photos: [_photo('s7'), _photo('g4'), _photo('g2')],
+    name: 'Teras Kerja',
+    area: 'Pejaten',
+    address: 'Jl. Contoh Pejaten No. 17',
+    location: LatLng(-6.2780, 106.8290),
+    openHour: 10,
+    closeHour: 22,
+    priceLevel: 2,
+    description: 'Ruang kerja semi outdoor yang dikelilingi tanaman. Udaranya sejuk di sore hari, dengan meja kerja yang nyaman dan colokan yang cukup.',
+  ),
+  Spot(
+    id: 's8',
+    category: SpotCategory.roastery,
+    photos: [_photo('s8'), _photo('g3'), _photo('g1')],
+    name: 'Biji Hitam Roastery',
+    area: 'Panglima Polim',
+    address: 'Jl. Contoh Panglima Polim No. 9',
+    location: LatLng(-6.2510, 106.7985),
+    openHour: 8,
+    closeHour: 18,
+    priceLevel: 3,
+    description: 'Roastery dengan kopi spesialti terbaik di area ini. Enak untuk kerja singkat di pagi hari, tapi colokannya sedikit dan tutup sore.',
+  ),
+  Spot(
+    id: 's9',
+    category: SpotCategory.kafe,
+    photos: [_photo('s9'), _photo('g1'), _photo('g4')],
+    name: 'Rumah Kopi Pagi',
+    area: 'Kebayoran Baru',
+    address: 'Jl. Contoh Kebayoran No. 2',
+    location: LatLng(-6.2380, 106.7960),
+    openHour: 6,
+    closeHour: 15,
+    priceLevel: 1,
+    description: 'Buka paling pagi di area ini. Tenang sebelum jam makan siang, dan cocok untuk menyelesaikan pekerjaan penting di awal hari.',
+  ),
+  Spot(
+    id: 's10',
+    category: SpotCategory.kafe,
+    photos: [_photo('s10'), _photo('g2'), _photo('g3')],
+    name: 'Hutan Kota Café',
+    area: 'Senayan',
+    address: 'Jl. Contoh Senayan No. 1',
+    location: LatLng(-6.2250, 106.8020),
+    openHour: 9,
+    closeHour: 21,
+    priceLevel: 3,
+    description: 'Spot baru dengan pemandangan kota dari jendela besar. Belum ada review, jadi jadilah yang pertama mencoba dan menilai kondisinya untuk kerja.',
+  ),
+];
+
+/// Review contoh. Waktunya dihitung mundur dari [now] supaya
+/// "x jam lalu" dan bobot kebaruan selalu terlihat realistis.
+List<Review> buildDummyReviews(DateTime now) {
+  var counter = 0;
+  Review r(
+    String spotId,
+    Duration ago,
+    String author, {
+    required int wifi,
+    required int power,
+    required int quiet,
+    required int comfort,
+    required CrowdLevel crowd,
+    double? speed,
+    String comment = '',
+  }) =>
+      Review(
+        id: 'seed-${counter++}',
+        spotId: spotId,
+        author: author,
+        wifi: wifi,
+        power: power,
+        quiet: quiet,
+        comfort: comfort,
+        crowd: crowd,
+        wifiSpeedMbps: speed,
+        comment: comment,
+        createdAt: now.subtract(ago),
+        verifiedCheckIn: true,
+      );
+
+  const h = Duration(hours: 1);
+  const d = Duration(days: 1);
+
+  return [
+    r('s1', h * 5, 'Dimas', wifi: 5, power: 5, quiet: 4, comfort: 4, crowd: CrowdLevel.sedang, speed: 48, comment: 'Lantai dua enak buat kerja seharian, colokan di tiap meja.'),
+    r('s1', d * 3, 'Ayu', wifi: 4, power: 5, quiet: 4, comfort: 5, crowd: CrowdLevel.sepi, speed: 42, comment: 'Kursinya nyaman, cocok buat sesi panjang.'),
+    r('s1', d * 40, 'Rizky', wifi: 4, power: 4, quiet: 3, comfort: 4, crowd: CrowdLevel.ramai, comment: 'Weekend lumayan ramai.'),
+    r('s2', h * 2, 'Nadia', wifi: 4, power: 3, quiet: 4, comfort: 5, crowd: CrowdLevel.sedang, speed: 35, comment: 'Interior cantik, tapi colokan terbatas.'),
+    r('s2', d * 10, 'Bima', wifi: 5, power: 2, quiet: 4, comfort: 5, crowd: CrowdLevel.sepi, speed: 55, comment: 'WiFi kencang, siapkan powerbank.'),
+    r('s3', h * 1, 'Sari', wifi: 3, power: 4, quiet: 2, comfort: 3, crowd: CrowdLevel.ramai, speed: 12, comment: 'Murah dan buka malam, tapi berisik.'),
+    r('s3', d * 6, 'Andre', wifi: 3, power: 4, quiet: 3, comfort: 3, crowd: CrowdLevel.ramai, speed: 15, comment: 'Oke untuk kerja ringan.'),
+    r('s4', h * 20, 'Putri', wifi: 4, power: 4, quiet: 5, comfort: 4, crowd: CrowdLevel.sepi, speed: 30, comment: 'Paling tenang di area ini, aman buat video call.'),
+    r('s4', d * 12, 'Fajar', wifi: 4, power: 5, quiet: 5, comfort: 4, crowd: CrowdLevel.sepi, speed: 28, comment: 'Ada ruang khusus tanpa musik.'),
+    r('s4', d * 100, 'Lina', wifi: 3, power: 4, quiet: 5, comfort: 3, crowd: CrowdLevel.sepi, comment: 'Dulu WiFi sering putus, semoga sudah membaik.'),
+    r('s5', h * 4, 'Yoga', wifi: 5, power: 5, quiet: 3, comfort: 4, crowd: CrowdLevel.sedang, speed: 60, comment: 'Ada stopkontak di bawah setiap meja.'),
+    r('s5', d * 2, 'Tika', wifi: 5, power: 4, quiet: 3, comfort: 4, crowd: CrowdLevel.ramai, speed: 52, comment: 'Siang hari penuh, datang pagi.'),
+    r('s6', h * 9, 'Arif', wifi: 3, power: 3, quiet: 2, comfort: 2, crowd: CrowdLevel.sedang, speed: 18, comment: 'Penyelamat deadline tengah malam.'),
+    r('s6', d * 25, 'Mega', wifi: 2, power: 3, quiet: 3, comfort: 2, crowd: CrowdLevel.sepi, speed: 9, comment: 'WiFi lemot di jam sibuk.'),
+    r('s7', h * 30, 'Hendra', wifi: 4, power: 4, quiet: 4, comfort: 4, crowd: CrowdLevel.sepi, speed: 25, comment: 'Adem kalau sore.'),
+    r('s8', d * 7, 'Citra', wifi: 4, power: 2, quiet: 3, comfort: 4, crowd: CrowdLevel.sedang, speed: 40, comment: 'Kopinya juara, tapi tutup sore.'),
+    r('s8', d * 60, 'Joko', wifi: 4, power: 2, quiet: 3, comfort: 3, crowd: CrowdLevel.sedang, comment: 'Colokan sedikit.'),
+    r('s9', d * 15, 'Wulan', wifi: 3, power: 2, quiet: 4, comfort: 3, crowd: CrowdLevel.sepi, speed: 14, comment: 'Enak buat kerja pagi sebelum ramai.'),
+  ];
+}
