@@ -27,8 +27,9 @@ class SpotMetaRow extends StatelessWidget {
     final stats = store.statsFor(spot.id);
     final isOpen = spot.isOpenAt(DateTime.now());
 
+    final rupiah = store.priceFor(spot);
     final price = _Meta(
-      text: priceLabel(spot.priceLevel),
+      text: rupiah == null ? '' : '±${formatRupiahShort(rupiah)}',
       strong: true,
       suffix: ' /orang',
     );
@@ -59,7 +60,7 @@ class SpotMetaRow extends StatelessWidget {
 
     final items = scoreFirst
         ? [score, open, distance]
-        : [if (showPrice && spot.priceLevel != null) price, distance, open];
+        : [if (showPrice && rupiah != null) price, distance, open];
 
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,

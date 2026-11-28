@@ -36,7 +36,7 @@ void main() {
     location: LatLng(0, 0),
     openHour: 8,
     closeHour: 22,
-    priceLevel: 2,
+    avgPrice: 45000,
     category: SpotCategory.kafe,
   );
 

@@ -21,7 +21,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2607, 106.8135),
     openHour: 8,
     closeHour: 22,
-    priceLevel: 2,
+    avgPrice: 45000,
     description: 'Kafe dua lantai dengan lantai atas yang khusus untuk kerja. Meja panjang, colokan di setiap meja, dan pencahayaan alami yang terang. Cocok untuk sesi kerja seharian.',
   ),
   Spot(
@@ -34,7 +34,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2321, 106.8090),
     openHour: 7,
     closeHour: 21,
-    priceLevel: 3,
+    avgPrice: 75000,
     description: 'Kafe bergaya minimalis dengan jendela besar dan banyak cahaya alami. Suasananya tenang di pagi hari, tapi colokan terbatas, jadi bawa powerbank.',
   ),
   Spot(
@@ -47,7 +47,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2443, 106.7990),
     openHour: 9,
     closeHour: 23,
-    priceLevel: 1,
+    avgPrice: 25000,
     description: 'Kafe ramah kantong yang buka sampai malam. Ramai mahasiswa, jadi lebih cocok untuk kerja ringan atau diskusi kelompok daripada video call.',
   ),
   Spot(
@@ -60,7 +60,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2440, 106.7835),
     openHour: 8,
     closeHour: 20,
-    priceLevel: 2,
+    avgPrice: 45000,
     description: 'Punya ruang khusus tanpa musik yang aman untuk video call dan kerja fokus. Kursi sofa yang empuk, banyak tanaman, dan suasana yang tenang sepanjang hari.',
   ),
   Spot(
@@ -73,7 +73,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2690, 106.7980),
     openHour: 7,
     closeHour: 22,
-    priceLevel: 2,
+    avgPrice: 45000,
     description: 'Didesain khusus untuk remote worker: stopkontak di bawah setiap meja, WiFi kencang, dan area duduk yang luas. Siang hari cepat penuh, jadi sebaiknya datang pagi.',
   ),
   Spot(
@@ -86,7 +86,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2260, 106.8470),
     openHour: 0,
     closeHour: 24,
-    priceLevel: 1,
+    avgPrice: 25000,
     description: 'Buka 24 jam, jadi selalu ada tempat untuk mengejar deadline tengah malam. WiFi bisa melambat di jam sibuk, tapi harganya paling bersahabat.',
   ),
   Spot(
@@ -99,7 +99,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2780, 106.8290),
     openHour: 10,
     closeHour: 22,
-    priceLevel: 2,
+    avgPrice: 45000,
     description: 'Ruang kerja semi outdoor yang dikelilingi tanaman. Udaranya sejuk di sore hari, dengan meja kerja yang nyaman dan colokan yang cukup.',
   ),
   Spot(
@@ -112,7 +112,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2510, 106.7985),
     openHour: 8,
     closeHour: 18,
-    priceLevel: 3,
+    avgPrice: 75000,
     description: 'Roastery dengan kopi spesialti terbaik di area ini. Enak untuk kerja singkat di pagi hari, tapi colokannya sedikit dan tutup sore.',
   ),
   Spot(
@@ -125,7 +125,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2380, 106.7960),
     openHour: 6,
     closeHour: 15,
-    priceLevel: 1,
+    avgPrice: 25000,
     description: 'Buka paling pagi di area ini. Tenang sebelum jam makan siang, dan cocok untuk menyelesaikan pekerjaan penting di awal hari.',
   ),
   Spot(
@@ -138,7 +138,7 @@ final dummySpots = <Spot>[
     location: LatLng(-6.2250, 106.8020),
     openHour: 9,
     closeHour: 21,
-    priceLevel: 3,
+    avgPrice: 75000,
     description: 'Spot baru dengan pemandangan kota dari jendela besar. Belum ada review, jadi jadilah yang pertama mencoba dan menilai kondisinya untuk kerja.',
   ),
 ];

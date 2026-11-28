@@ -53,3 +53,6 @@ app.*.map.json
 # Kunci Supabase: JANGAN di-commit (contohnya ada di env.example.json & .env.example)
 env.json
 .env
+
+# Cache data OpenStreetMap untuk script import
+seed/.cache/

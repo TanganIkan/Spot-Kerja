@@ -20,6 +20,8 @@ class SpotStats {
     this.wifiSpeedMbps,
     this.wifiMeasuredAt,
     this.facts = PlaceFacts.empty,
+    this.typicalSpend,
+    this.spendReports = 0,
   });
 
   static const empty = SpotStats(
@@ -46,6 +48,22 @@ class SpotStats {
 
   /// Atribut lokal (rokok, AC, parkir, duduk lama, jam ramai).
   final PlaceFacts facts;
+
+  /// Median laporan "habis berapa per orang" (Rupiah), dibulatkan ke ribuan.
+  /// Median dipakai (bukan rata-rata) supaya satu laporan ekstrem tidak
+  /// menggeser angka.
+  final int? typicalSpend;
+  final int spendReports;
+
+  static int? medianSpend(List<int> values) {
+    if (values.isEmpty) return null;
+    final sorted = [...values]..sort();
+    final mid = sorted.length ~/ 2;
+    final median = sorted.length.isOdd
+        ? sorted[mid].toDouble()
+        : (sorted[mid - 1] + sorted[mid]) / 2;
+    return (median / 1000).round() * 1000;
+  }
 
   bool get hasData => reviewCount > 0;
 
@@ -93,6 +111,10 @@ class SpotStats {
       latestCrowdAt: latest.createdAt,
       wifiSpeedMbps: latestSpeed?.wifiSpeedMbps,
       wifiMeasuredAt: latestSpeed?.createdAt,
+      typicalSpend: medianSpend([
+        for (final r in reviews) ?r.spendPerPerson,
+      ]),
+      spendReports: reviews.where((r) => r.spendPerPerson != null).length,
       facts: PlaceFacts.fromAnswers([
         for (final r in reviews)
           FactAnswer(

@@ -66,7 +66,7 @@ class SpotDetailScreen extends StatelessWidget {
                 Text(spot.name,
                     style: theme.textTheme.titleLarge?.copyWith(fontSize: 22)),
                 const SizedBox(height: 4),
-                Text('${spot.address}, ${spot.area}',
+                Text(spot.fullAddress,
                     style: const TextStyle(color: AppColors.muted)),
                 const SizedBox(height: 12),
                 SpotMetaRow(spot: spot),
@@ -86,6 +86,7 @@ class SpotDetailScreen extends StatelessWidget {
                   children: [
                     _Tag(icon: Icons.category_outlined, text: spot.category.label),
                     _Tag(icon: Icons.schedule_rounded, text: spot.hoursLabel),
+                    _Tag(icon: Icons.payments_outlined, text: _priceText(store, spot)),
                     _Tag(
                       icon: Icons.near_me_outlined,
                       text: '${formatDistance(store.distanceTo(spot))} dari '
@@ -165,9 +166,9 @@ class _PhotoHeaderState extends State<_PhotoHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final photos = widget.spot.photos.isEmpty
-        ? <String?>[null]
-        : widget.spot.photos.cast<String?>();
+    // Foto bawaan tempat + foto dari review user.
+    final all = context.watch<SpotStore>().photosFor(widget.spot);
+    final photos = all.isEmpty ? <String?>[null] : all.cast<String?>();
     final favorites = context.watch<FavoritesStore>();
     final saved = favorites.isFavorite(widget.spot.id);
 
@@ -277,8 +278,12 @@ class _Tag extends StatelessWidget {
           children: [
             Icon(icon, size: 15, color: AppColors.primaryText),
             const SizedBox(width: 5),
-            Text(text,
-                style: const TextStyle(fontSize: 12.5, color: AppColors.ink)),
+            // Flexible: teks panjang turun ke baris berikutnya, tidak meluber.
+            Flexible(
+              child: Text(text,
+                  style:
+                      const TextStyle(fontSize: 12.5, color: AppColors.ink)),
+            ),
           ],
         ),
       );
@@ -632,6 +637,27 @@ class _ReviewTile extends StatelessWidget {
             const SizedBox(height: 8),
             Text(review.comment, style: const TextStyle(height: 1.45)),
           ],
+          if (review.photoUrls.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                for (final url in review.photoUrls)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: GestureDetector(
+                      onTap: () => _showPhoto(context, url),
+                      child: SpotPhoto(
+                        path: url,
+                        width: 76,
+                        height: 76,
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusSmall),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
           const SizedBox(height: 10),
           const Divider(),
         ],
@@ -865,4 +891,56 @@ class _FactTile extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Tampilkan foto ukuran penuh (bisa di-zoom).
+void _showPhoto(BuildContext context, String url) {
+  showDialog<void>(
+    context: context,
+    barrierColor: Colors.black87,
+    builder: (dialogContext) => GestureDetector(
+      onTap: () => Navigator.of(dialogContext).pop(),
+      child: Stack(
+        children: [
+          Center(
+            child: InteractiveViewer(
+              child: Image.network(
+                url,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => const Icon(
+                    Icons.broken_image_outlined,
+                    color: Colors.white54,
+                    size: 48),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: RoundIconButton(
+                  icon: Icons.close_rounded,
+                  tooltip: 'Tutup',
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+/// "±25rb per orang · dari 3 laporan" / "±45rb per orang (perkiraan awal)".
+String _priceText(SpotStore store, Spot spot) {
+  final stats = store.statsFor(spot.id);
+  final price = store.priceFor(spot);
+  if (price == null) return 'Harga belum diketahui';
+  final base = '±${formatRupiahShort(price)} per orang';
+  if (stats.typicalSpend != null) {
+    return '$base · dari ${stats.spendReports} laporan';
+  }
+  return '$base (perkiraan awal)';
 }

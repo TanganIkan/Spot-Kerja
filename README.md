@@ -61,8 +61,11 @@ Foto dari Unsplash (lisensi gratis), daftar sumber di `assets/images/spots/CREDI
 
 **Tipografi:** Plus Jakarta Sans (SIL Open Font License), di `assets/fonts/`.
 
-**Ikon & splash screen:** pin lokasi putih dengan petir ⚡ (simbol Work Score) di atas
-gradasi oranye. Gambarnya dibuat oleh `tool/generate_brand_assets.py`, lalu
+**Logo "Radius spot":** titik di tengah cincin, dikelilingi cincin putus-putus,
+yaitu sebuah spot dan radius pencarian di sekitarnya (sama seperti lingkaran radius
+di peta app). Cincin luar sengaja putus-putus supaya tidak menyerupai logo
+"bullseye" milik brand lain. Dipakai di ikon app, splash screen, favicon, dan
+onboarding. Gambarnya dibuat oleh `tool/generate_brand_assets.py`, lalu
 dipasang ke Android, iOS, dan web lewat `flutter_launcher_icons` dan
 `flutter_native_splash` (lihat bagian *Menjalankan*).
 
@@ -99,6 +102,7 @@ Semua angka di bawah bisa diubah di satu tempat (lihat kolom "Di mana").
 | Filter "Banyak colokan" / "Tenang" | rata-rata rating ≥ 4.0 | `models/spot_filter.dart` |
 | Filter "Buka malam" | tutup jam 22.00 atau lebih | `models/spot.dart` |
 | Atribut lokal (rokok, tempat duduk, parkir motor, duduk lama) | suara terbanyak dari review, berbobot kebaruan; kalau seri, jawaban terbaru menang | `models/place_facts.dart` |
+| Harga per orang | median laporan "habis berapa per orang" di review (tahan laporan ekstrem), dibulatkan ke ribuan; kalau belum ada laporan pakai perkiraan data awal | `models/spot_stats.dart` |
 | Jam ramai | ditampilkan kalau dilaporkan oleh ≥ 50% (berbobot) yang menjawab | `models/place_facts.dart` |
 | Filter "Bebas rokok" | bebas rokok **atau** area rokok terpisah (ada ruangan tanpa asap) | `models/place_facts.dart` |
 | Filter "Ber-AC" / "Parkir motor" / "Boleh duduk lama" | indoor ber-AC atau indoor & outdoor / parkir mudah / bebas duduk lama | `models/place_facts.dart` |

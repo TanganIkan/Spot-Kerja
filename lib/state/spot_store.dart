@@ -54,6 +54,9 @@ class SpotStore extends ChangeNotifier {
 
   /// Pesan error terakhir saat mengirim review (untuk ditampilkan ke user).
   String? lastReviewError;
+
+  /// Jumlah foto yang gagal diunggah pada review terakhir.
+  int lastPhotoFailures = 0;
   bool hasRealLocation = false;
   bool isLocating = false;
 
@@ -112,6 +115,25 @@ class SpotStore extends ChangeNotifier {
   // ---- Query ------------------------------------------------------------
 
   List<Spot> get allSpots => List.unmodifiable(_spots);
+
+  /// Apakah user bisa melampirkan foto (hanya di mode Supabase).
+  bool get supportsPhotos => _repository.supportsPhotos;
+
+  /// Semua foto spot: foto bawaan tempat dulu, lalu foto dari review
+  /// (review terbaru lebih dulu).
+  List<String> photosFor(Spot spot) => [
+        ...spot.photos,
+        for (final r in reviewsFor(spot.id)) ...r.photoUrls,
+      ];
+
+  /// Perkiraan pengeluaran per orang: median laporan pengunjung, atau
+  /// perkiraan data awal kalau belum ada laporan.
+  int? priceFor(Spot spot) => statsFor(spot.id).typicalSpend ?? spot.avgPrice;
+
+  String? coverPhotoFor(Spot spot) {
+    final photos = photosFor(spot);
+    return photos.isEmpty ? null : photos.first;
+  }
 
   Spot? spotById(String id) {
     for (final s in _spots) {
@@ -197,6 +219,8 @@ class SpotStore extends ChangeNotifier {
     bool? motorParking,
     StayPolicy? stay,
     Set<BusyTime> busyTimes = const {},
+    List<Uint8List> photos = const [],
+    int? spendPerPerson,
   }) async {
     if (hasReachedReviewLimit(spotId)) return ReviewResult.limitReached;
     final spot = spotById(spotId);
@@ -226,6 +250,7 @@ class SpotStore extends ChangeNotifier {
       motorParking: motorParking,
       stay: stay,
       busyTimes: busyTimes,
+      spendPerPerson: spendPerPerson,
     );
 
     // Repository mengembalikan versi tersimpan. Di Supabase, status
@@ -235,6 +260,7 @@ class SpotStore extends ChangeNotifier {
       saved = await _repository.addReview(
         review,
         checkInLocation: hasRealLocation ? userLocation : null,
+        photos: photos,
       );
     } on ReviewLimitException {
       return ReviewResult.limitReached;
@@ -243,6 +269,7 @@ class SpotStore extends ChangeNotifier {
       return ReviewResult.failed;
     }
     lastReviewError = null;
+    lastPhotoFailures = photos.length - saved.photoUrls.length;
     _reviewsBySpot.putIfAbsent(spotId, () => []).add(saved);
     _statsCache.remove(spotId);
     notifyListeners();

@@ -351,10 +351,19 @@ class _LocationIllustration extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
+          // Gelombang radius di belakang logo. Lingkaran paling dalam sengaja
+          // putih, supaya cincin putus-putus di logo tetap kontras.
           ring(280, 0.12),
-          ring(200, 0.18),
-          ring(124, 0.28),
-          Image.asset('assets/branding/splash_logo.png', width: 120),
+          ring(210, 0.18),
+          Container(
+            width: 150,
+            height: 150,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+          ),
+          Image.asset('assets/branding/splash_logo.png', width: 160),
           const Positioned(
             top: 34,
             right: 18,

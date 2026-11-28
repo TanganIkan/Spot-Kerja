@@ -28,9 +28,15 @@ dari yang tertulis di sini karena Supabase & Google rutin memperbarui tampilanny
 3. Klik **Run**. Hasil yang diharapkan: *Success. No rows returned*.
 4. Cek di **Table Editor**: harus ada tabel `spots`, `profiles`, `reviews`.
 
-5. Ulangi langkah 1–3 untuk file kedua,
-   [`supabase/migrations/20261128010000_grants.sql`](../supabase/migrations/20261128010000_grants.sql),
-   yang berisi izin akses tabel untuk app.
+5. Ulangi langkah 1–3 untuk file-file berikutnya, berurutan:
+   - [`supabase/migrations/20261128010000_grants.sql`](../supabase/migrations/20261128010000_grants.sql):
+     izin akses tabel untuk app
+   - [`supabase/migrations/20261128020000_service_role_grants.sql`](../supabase/migrations/20261128020000_service_role_grants.sql):
+     izin untuk script import data awal
+   - [`supabase/migrations/20261128030000_spot_photos.sql`](../supabase/migrations/20261128030000_spot_photos.sql):
+     penyimpanan foto dari user (bucket `spot-photos` + tabel `spot_photos`)
+   - [`supabase/migrations/20261128040000_spend_per_person.sql`](../supabase/migrations/20261128040000_spend_per_person.sql):
+     harga dalam Rupiah (`avg_price` & `spend_per_person`)
 
 Kalau muncul error, salin pesan errornya dan kirim ke chat. Jalankan setiap file
 **hanya sekali** per project, berurutan sesuai nama file.

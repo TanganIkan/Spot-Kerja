@@ -25,7 +25,7 @@ class Spot {
     required this.category,
     this.openHour,
     this.closeHour,
-    this.priceLevel,
+    this.avgPrice,
     this.photos = const [],
     this.description = '',
   });
@@ -52,9 +52,14 @@ class Spot {
   /// null = belum diketahui.
   final int? closeHour;
 
-  /// 1 = hemat, 2 = sedang, 3 = premium. null = belum diketahui.
-  final int? priceLevel;
+  /// Perkiraan pengeluaran per orang (Rupiah) dari data awal.
+  /// Laporan pengunjung (median) lebih diutamakan, lihat [SpotStats.typicalSpend].
+  final int? avgPrice;
   final String description;
+
+  /// "Jl. X No. 1, Canggu", atau hanya "Canggu" kalau alamat kosong.
+  String get fullAddress =>
+      [address, area].where((part) => part.trim().isNotEmpty).join(', ');
 
   bool get hasHours => openHour != null && closeHour != null;
 

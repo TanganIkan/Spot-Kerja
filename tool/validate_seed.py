@@ -13,17 +13,16 @@ from pathlib import Path
 
 COLUMNS = [
     "nama_tempat", "area", "kategori", "bulan_kunjungan", "wifi", "speed_mbps",
-    "colokan", "tenang", "nyaman", "keramaian", "harga", "jam_buka", "jam_tutup",
+    "colokan", "tenang", "nyaman", "keramaian", "harga_per_orang", "jam_buka", "jam_tutup",
     "rokok", "tempat_duduk", "parkir_motor", "duduk_lama", "jam_ramai",
     "komentar", "link_maps_pribadi",
 ]
 REQUIRED = ["nama_tempat", "area", "kategori"]
-REVIEW = ["bulan_kunjungan", "wifi", "colokan", "tenang", "nyaman"]
+REVIEW = ["bulan_kunjungan", "wifi", "colokan", "tenang", "nyaman", "keramaian"]
 RATINGS = ["wifi", "colokan", "tenang", "nyaman"]
 CHOICES = {
     "kategori": {"kafe", "coworking", "roastery"},
     "keramaian": {"sepi", "sedang", "ramai"},
-    "harga": {"hemat", "sedang", "premium"},
     "rokok": {"bebas_rokok", "area_terpisah", "boleh_merokok"},
     "tempat_duduk": {"indoor_ac", "outdoor", "keduanya"},
     "parkir_motor": {"ya", "tidak"},
@@ -31,6 +30,20 @@ CHOICES = {
 }
 BUSY_TIMES = {"pagi", "siang", "sore", "malam"}
 EXAMPLE_PREFIX = "(CONTOH)"
+MIN_RUPIAH, MAX_RUPIAH = 1000, 1_000_000
+
+
+def parse_rupiah(text: str):
+    """'35000', '35.000', '35rb', '35 ribu', '35k' -> 35000. Tidak valid -> None."""
+    t = text.strip().lower().replace("rp", "").replace(" ", "")
+    if not t:
+        return None
+    m = re.fullmatch(r"(\d+(?:[.,]\d+)?)(rb|ribu|k)", t)
+    if m:
+        return round(float(m.group(1).replace(",", ".")) * 1000)
+    if re.fullmatch(r"\d{1,3}([.,]\d{3})+", t) or re.fullmatch(r"\d+", t):
+        return int(re.sub(r"[.,]", "", t))
+    return None
 
 
 def check_row(row: dict) -> list[str]:
@@ -71,16 +84,24 @@ def check_row(row: dict) -> list[str]:
         if v and v not in allowed:
             errors.append(f"{col} harus salah satu dari {sorted(allowed)}, bukan '{v}'")
 
+    # Jam boleh "07:00" atau "7:00" (Google Sheets sering membuang nol depan).
     for col in ("jam_buka", "jam_tutup"):
         v = get(col)
-        if v and not re.fullmatch(r"([01]\d|2[0-4]):[0-5]\d", v):
-            errors.append(f"{col} harus format HH:MM (08:00), bukan '{v}'")
+        m = re.fullmatch(r"(\d{1,2}):([0-5]\d)", v) if v else None
+        if v and (not m or int(m.group(1)) > 24 or (int(m.group(1)) == 24 and m.group(2) != "00")):
+            errors.append(f"{col} harus format jam (08:00 atau 8:00), bukan '{v}'")
 
     v = get("jam_ramai").lower()
     if v:
         bad = [t for t in v.split(";") if t.strip() not in BUSY_TIMES]
         if bad:
             errors.append(f"jam_ramai hanya boleh {sorted(BUSY_TIMES)} dipisah ';', ada: {bad}")
+
+    v = get("harga_per_orang")
+    if v:
+        rupiah = parse_rupiah(v)
+        if rupiah is None or not MIN_RUPIAH <= rupiah <= MAX_RUPIAH:
+            errors.append(f"harga_per_orang harus angka Rupiah (35000 atau 35rb), bukan '{v}'")
 
     if len(get("komentar")) > 280:
         errors.append("komentar lebih dari 280 karakter")
@@ -97,6 +118,11 @@ def main(path: str) -> int:
     with file.open(newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         header = reader.fieldnames or []
+        if "harga" in header and "harga_per_orang" not in header:
+            print("Kolom 'harga' (hemat/sedang/premium) sudah diganti menjadi "
+                  "'harga_per_orang' (angka Rupiah, mis. 35000 atau 35rb).\n"
+                  "Ganti nama kolomnya di baris pertama, lalu isi angkanya.")
+            return 1
         missing_cols = [c for c in COLUMNS if c not in header]
         extra_cols = [c for c in header if c not in COLUMNS]
         if missing_cols or extra_cols:

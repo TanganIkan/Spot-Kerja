@@ -31,6 +31,11 @@ class AccountButton extends StatelessWidget {
               ? Image.network(
                   avatar,
                   fit: BoxFit.cover,
+                  // Foto profil Google tidak mengizinkan CORS; di web pakai
+                  // elemen <img> biasa sebagai cadangan.
+                  webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
+                  loadingBuilder: (_, child, progress) =>
+                      progress == null ? child : const _InitialIcon(),
                   errorBuilder: (_, _, _) => const _InitialIcon(),
                 )
               : const _InitialIcon(),

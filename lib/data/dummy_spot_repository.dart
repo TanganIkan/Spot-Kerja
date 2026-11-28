@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:latlong2/latlong.dart';
 
 import '../models/review.dart';
@@ -13,6 +15,10 @@ class DummySpotRepository implements SpotRepository {
 
   final LocalStorage _storage;
 
+  /// Data contoh tidak punya server untuk menyimpan foto.
+  @override
+  bool get supportsPhotos => false;
+
   @override
   Future<List<Spot>> fetchSpots() async {
     // Simulasi jeda jaringan supaya loading state ikut teruji.
@@ -27,7 +33,11 @@ class DummySpotRepository implements SpotRepository {
       ];
 
   @override
-  Future<Review> addReview(Review review, {LatLng? checkInLocation}) async {
+  Future<Review> addReview(
+    Review review, {
+    LatLng? checkInLocation,
+    List<Uint8List> photos = const [],
+  }) async {
     final saved = _storage.loadUserReviews()..add(review);
     await _storage.saveUserReviews(saved);
     return review;

@@ -25,7 +25,8 @@ class NearbySpotCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stats = context.watch<SpotStore>().statsFor(spot.id);
+    final store = context.watch<SpotStore>();
+    final stats = store.statsFor(spot.id);
     return Container(
       width: width,
       clipBehavior: Clip.antiAlias,
@@ -43,7 +44,11 @@ class NearbySpotCard extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  SpotPhoto(path: spot.coverPhoto, height: 150, width: width),
+                  SpotPhoto(
+                    path: store.coverPhotoFor(spot),
+                    height: 150,
+                    width: width,
+                  ),
                   Positioned(top: 10, right: 10, child: ScorePill(stats: stats)),
                 ],
               ),
@@ -60,7 +65,7 @@ class NearbySpotCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      '${spot.address}, ${spot.area}',
+                      spot.fullAddress,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -95,6 +100,7 @@ class CompactSpotCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final favorites = context.watch<FavoritesStore>();
+    final store = context.watch<SpotStore>();
     final saved = favorites.isFavorite(spot.id);
 
     return Container(
@@ -113,7 +119,7 @@ class CompactSpotCard extends StatelessWidget {
             child: Row(
               children: [
                 SpotPhoto(
-                  path: spot.coverPhoto,
+                  path: store.coverPhotoFor(spot),
                   width: 84,
                   height: 84,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),

@@ -17,7 +17,7 @@ void main() {
       'lng': 115.1385,
       'open_hour': null,
       'close_hour': null,
-      'price_level': null,
+      'avg_price': null,
       'description': '',
       'photos': ['https://contoh.supabase.co/storage/v1/object/public/foto/1.jpg'],
       'created_at': '2026-11-28T03:00:00+00:00',
@@ -26,7 +26,7 @@ void main() {
     expect(spot.location.latitude, -8.6478);
     expect(spot.hasHours, isFalse);
     expect(spot.isOpenAt(DateTime(2026, 11, 28, 10)), isNull);
-    expect(spot.priceLevel, isNull);
+    expect(spot.avgPrice, isNull);
     expect(spot.coverPhoto, startsWith('https://'));
   });
 
@@ -34,7 +34,7 @@ void main() {
     final spot = SupabaseSpotRepository.spotFromRow({
       'id': 'x', 'name': 'A', 'area': 'B', 'category': 'kafe',
       'lat': -8, 'lng': 115, 'open_hour': 8, 'close_hour': 22,
-      'price_level': 2, 'photos': [],
+      'avg_price': 35000, 'photos': [],
     });
     expect(spot.location.longitude, 115.0);
     expect(spot.isOpenAt(DateTime(2026, 11, 28, 10)), isTrue);
@@ -84,5 +84,26 @@ void main() {
     expect(review.isMine, isFalse);
     expect(review.wifiSpeedMbps, isNull);
     expect(review.busyTimes, isEmpty);
+  });
+
+  test('foto review: URL dibuat dari storage_path & urut waktu unggah', () {
+    final review = SupabaseSpotRepository.reviewFromRow(
+      {
+        'id': 'r3', 'spot_id': 's1', 'user_id': 'u1', 'author_name': 'Putu',
+        'wifi': 4, 'power': 4, 'quiet': 4, 'comfort': 4, 'crowd': 'sepi',
+        'comment': '', 'busy_times': [], 'verified_check_in': true,
+        'visited_at': '2026-11-28T03:00:00+00:00',
+        'spot_photos': [
+          {'storage_path': 'u1/r3/b.jpg', 'created_at': '2026-11-28T03:00:02+00:00'},
+          {'storage_path': 'u1/r3/a.jpg', 'created_at': '2026-11-28T03:00:01+00:00'},
+        ],
+      },
+      'u1',
+      photoUrl: (path) => 'https://cdn.contoh/spot-photos/$path',
+    );
+    expect(review.photoUrls, [
+      'https://cdn.contoh/spot-photos/u1/r3/a.jpg',
+      'https://cdn.contoh/spot-photos/u1/r3/b.jpg',
+    ]);
   });
 }

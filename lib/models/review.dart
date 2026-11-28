@@ -35,6 +35,8 @@ class Review {
     this.motorParking,
     this.stay,
     this.busyTimes = const {},
+    this.photoUrls = const [],
+    this.spendPerPerson,
   });
 
   final String id;
@@ -73,6 +75,36 @@ class Review {
   final StayPolicy? stay;
   final Set<BusyTime> busyTimes;
 
+  /// URL foto yang dilampirkan penulis review (maksimal 3).
+  final List<String> photoUrls;
+
+  /// Laporan "habis berapa per orang" dalam Rupiah (opsional).
+  final int? spendPerPerson;
+
+  /// Salinan review ini dengan daftar foto yang berbeda.
+  Review withPhotos(List<String> urls) => Review(
+        id: id,
+        spotId: spotId,
+        author: author,
+        wifi: wifi,
+        power: power,
+        quiet: quiet,
+        comfort: comfort,
+        crowd: crowd,
+        createdAt: createdAt,
+        comment: comment,
+        wifiSpeedMbps: wifiSpeedMbps,
+        verifiedCheckIn: verifiedCheckIn,
+        isMine: isMine,
+        smoking: smoking,
+        seating: seating,
+        motorParking: motorParking,
+        stay: stay,
+        busyTimes: busyTimes,
+        photoUrls: urls,
+        spendPerPerson: spendPerPerson,
+      );
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'spotId': spotId,
@@ -92,6 +124,8 @@ class Review {
         'motorParking': motorParking,
         'stay': stay?.name,
         'busyTimes': busyTimes.map((t) => t.name).toList(),
+        'photoUrls': photoUrls,
+        'spendPerPerson': spendPerPerson,
       };
 
   factory Review.fromJson(Map<String, dynamic> json) => Review(
@@ -117,6 +151,11 @@ class Review {
           for (final name in (json['busyTimes'] as List<dynamic>? ?? const []))
             ?_enumOrNull(BusyTime.values, name),
         },
+        photoUrls: [
+          for (final url in (json['photoUrls'] as List<dynamic>? ?? const []))
+            '$url',
+        ],
+        spendPerPerson: json['spendPerPerson'] as int?,
       );
 
   static T? _enumOrNull<T extends Enum>(List<T> values, Object? name) {
