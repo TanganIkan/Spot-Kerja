@@ -91,9 +91,14 @@ class _ReviewFormScreenState extends State<ReviewFormScreen> {
             'di lokasi.',
       ReviewResult.limitReached =>
         'Kamu sudah mereview tempat ini hari ini.',
+      ReviewResult.failed =>
+        'Review gagal dikirim. Periksa koneksi internet lalu coba lagi.',
     };
     messenger.showSnackBar(SnackBar(content: Text(message)));
-    if (result != ReviewResult.limitReached) navigator.pop();
+    if (result == ReviewResult.savedVerified ||
+        result == ReviewResult.savedUnverified) {
+      navigator.pop();
+    }
   }
 
   @override

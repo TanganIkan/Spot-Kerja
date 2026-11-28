@@ -11,6 +11,7 @@ import '../state/favorites_store.dart';
 import '../state/spot_store.dart';
 import '../theme/app_theme.dart';
 import '../utils/format.dart';
+import '../widgets/account_sheet.dart';
 import '../widgets/map_widgets.dart';
 import '../widgets/round_icon_button.dart';
 import '../widgets/spot_meta_row.dart';
@@ -127,11 +128,20 @@ class SpotDetailScreen extends StatelessWidget {
             child: FilledButton.icon(
               icon: const Icon(Icons.rate_review_outlined),
               label: const Text('Check-in & Review'),
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => ReviewFormScreen(spotId: spot.id),
-                ),
-              ),
+              onPressed: () async {
+                // Menulis review butuh akun (di mode Supabase).
+                final signedIn = await ensureSignedIn(
+                  context,
+                  reason: 'Masuk dulu untuk check-in dan menulis review. '
+                      'Nama dan foto profil Google-mu akan tampil di review.',
+                );
+                if (!signedIn || !context.mounted) return;
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => ReviewFormScreen(spotId: spot.id),
+                  ),
+                );
+              },
             ),
           ),
         ),

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spot_kerja/data/dummy_spot_repository.dart';
 import 'package:spot_kerja/data/local_storage.dart';
 import 'package:spot_kerja/main.dart';
+import 'package:spot_kerja/state/auth_store.dart';
 import 'package:spot_kerja/state/favorites_store.dart';
 import 'package:spot_kerja/state/spot_store.dart';
 
@@ -24,6 +25,7 @@ void main() {
       MultiProvider(
         providers: [
           Provider<LocalStorage>.value(value: storage),
+          ChangeNotifierProvider<AuthStore>.value(value: LocalAuthStore()),
           ChangeNotifierProvider.value(value: store..load(locate: false)),
           ChangeNotifierProvider(create: (_) => FavoritesStore(storage)),
         ],

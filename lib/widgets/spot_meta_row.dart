@@ -38,8 +38,16 @@ class SpotMetaRow extends StatelessWidget {
     );
     final open = _Meta(
       icon: Icons.schedule_rounded,
-      text: isOpen ? 'Buka' : 'Tutup',
-      color: isOpen ? AppColors.success : AppColors.danger,
+      text: switch (isOpen) {
+        true => 'Buka',
+        false => 'Tutup',
+        null => 'Jam ?',
+      },
+      color: switch (isOpen) {
+        true => AppColors.success,
+        false => AppColors.danger,
+        null => null,
+      },
     );
     final score = _Meta(
       icon: Icons.bolt_rounded,
@@ -51,7 +59,7 @@ class SpotMetaRow extends StatelessWidget {
 
     final items = scoreFirst
         ? [score, open, distance]
-        : [if (showPrice) price, distance, open];
+        : [if (showPrice && spot.priceLevel != null) price, distance, open];
 
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,

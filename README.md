@@ -143,14 +143,31 @@ lib/
 ```
 
 Alur data: **Repository → Store (state) → Screen**. Layar tidak pernah
-mengambil data langsung. Karena itu, mengganti data dummy dengan Supabase cukup
-dilakukan di satu file.
+mengambil data langsung. `DummySpotRepository` dan `SupabaseSpotRepository`
+memakai kontrak yang sama, dan `main.dart` memilih salah satunya berdasarkan
+ada/tidaknya kunci Supabase.
+
+Di mode Supabase, aturan penting dijaga oleh **database**, bukan hanya oleh app
+(lihat `supabase/migrations/`):
+- check-in terverifikasi dihitung server dari jarak ke spot (≤ 200 m), lalu
+  posisi user **dibuang** (tidak disimpan)
+- batas 1 review per user per spot per hari (unique index, zona waktu WITA)
+- nama penulis diambil dari profil Google, bukan dari app
+- Row Level Security: semua orang bisa membaca, hanya pemilik yang bisa menulis
+  atau menghapus review-nya
 
 ## Menjalankan
 
+App punya dua mode:
+
+- **Data contoh** (default): tanpa backend, langsung jalan setelah clone.
+- **Supabase**: data & login Google sungguhan. Setup sekali dengan
+  [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md), lalu jalankan dengan
+  `--dart-define-from-file=env.json`.
+
 ```bash
 flutter pub get
-flutter run -d chrome      # preview di browser
+flutter run -d chrome      # preview di browser (data contoh)
 flutter test               # unit test + widget test alur utama & onboarding
 ```
 
@@ -171,6 +188,7 @@ Untuk iOS Simulator, install Xcode dulu dari App Store, lalu `flutter run`.
 
 1. **v0.1 (sekarang)**: beranda, peta, filter, detail, Work Score, review, tersimpan,
    desain baru, font, ikon, splash screen, onboarding
-2. **v0.2**: Supabase (auth + database + PostGIS untuk query "spot dalam radius X")
+2. **v0.2 (sedang dikerjakan)**: Supabase (login Google + database + PostGIS),
+   import data awal Bali
 3. **v0.3**: speed test otomatis, upload foto, tambah spot baru
 4. **v0.4**: seed data nyata dari OpenStreetMap (Overpass API), marker clustering

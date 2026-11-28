@@ -8,6 +8,7 @@ import 'package:spot_kerja/main.dart';
 import 'package:spot_kerja/screens/home_screen.dart';
 import 'package:spot_kerja/screens/review_form_screen.dart';
 import 'package:spot_kerja/services/location_service.dart';
+import 'package:spot_kerja/state/auth_store.dart';
 import 'package:spot_kerja/state/favorites_store.dart';
 import 'package:spot_kerja/state/spot_store.dart';
 
@@ -24,6 +25,7 @@ void main() {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
+          ChangeNotifierProvider<AuthStore>.value(value: LocalAuthStore()),
           ChangeNotifierProvider(
             create: (_) => SpotStore(DummySpotRepository(storage))..load(),
           ),

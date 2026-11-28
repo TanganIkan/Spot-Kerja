@@ -10,22 +10,28 @@ import '../models/spot_stats.dart';
 import '../services/location_service.dart';
 
 /// Hasil percobaan mengirim review.
-enum ReviewResult { savedVerified, savedUnverified, limitReached }
+enum ReviewResult { savedVerified, savedUnverified, limitReached, failed }
 
 /// State utama app: daftar spot, review, filter, pencarian, dan lokasi user.
 ///
 /// Layar memanggil `context.watch<SpotStore>()` sehingga otomatis
 /// di-render ulang setiap kali [notifyListeners] dipanggil.
 class SpotStore extends ChangeNotifier {
-  SpotStore(this._repository);
+  SpotStore(
+    this._repository, {
+    LatLng? defaultCenter,
+    this.defaultAreaName = 'Jakarta Selatan (area contoh)',
+  })  : defaultCenter = defaultCenter ?? LatLng(-6.2450, 106.8080),
+        userLocation = defaultCenter ?? LatLng(-6.2450, 106.8080);
 
   final SpotRepository _repository;
 
   // ---- Batasan aplikasi -------------------------------------------------
 
-  /// Titik tengah data contoh. Dipakai kalau lokasi user tidak tersedia.
-  static final defaultCenter = LatLng(-6.2450, 106.8080);
-  static const defaultAreaName = 'Jakarta Selatan';
+  /// Titik tengah area data. Dipakai kalau lokasi user tidak tersedia.
+  /// Data contoh: Jakarta Selatan. Data Supabase: Bali (diatur di main.dart).
+  final LatLng defaultCenter;
+  final String defaultAreaName;
 
   /// Review dianggap "check-in terverifikasi" kalau user berada dalam radius ini.
   static const checkInRadiusMeters = 200.0;
@@ -44,7 +50,10 @@ class SpotStore extends ChangeNotifier {
   String? error;
   SpotFilter filter = const SpotFilter();
   String query = '';
-  LatLng userLocation = defaultCenter;
+  LatLng userLocation;
+
+  /// Pesan error terakhir saat mengirim review (untuk ditampilkan ke user).
+  String? lastReviewError;
   bool hasRealLocation = false;
   bool isLocating = false;
 
@@ -70,6 +79,22 @@ class SpotStore extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
     if (locate) await refreshLocation();
+  }
+
+  /// Muat ulang review saja, misalnya setelah user login/logout
+  /// (status "review milikku" ikut berubah).
+  Future<void> reloadReviews() async {
+    try {
+      final reviews = await _repository.fetchReviews();
+      _reviewsBySpot.clear();
+      _statsCache.clear();
+      for (final r in reviews) {
+        _reviewsBySpot.putIfAbsent(r.spotId, () => []).add(r);
+      }
+      notifyListeners();
+    } catch (_) {
+      // Data lama tetap ditampilkan.
+    }
   }
 
   Future<void> refreshLocation() async {
@@ -203,10 +228,26 @@ class SpotStore extends ChangeNotifier {
       busyTimes: busyTimes,
     );
 
-    await _repository.addReview(review);
-    _reviewsBySpot.putIfAbsent(spotId, () => []).add(review);
+    // Repository mengembalikan versi tersimpan. Di Supabase, status
+    // check-in & nama penulis ditentukan ulang oleh server.
+    final Review saved;
+    try {
+      saved = await _repository.addReview(
+        review,
+        checkInLocation: hasRealLocation ? userLocation : null,
+      );
+    } on ReviewLimitException {
+      return ReviewResult.limitReached;
+    } catch (e) {
+      lastReviewError = e.toString();
+      return ReviewResult.failed;
+    }
+    lastReviewError = null;
+    _reviewsBySpot.putIfAbsent(spotId, () => []).add(saved);
     _statsCache.remove(spotId);
     notifyListeners();
-    return verified ? ReviewResult.savedVerified : ReviewResult.savedUnverified;
+    return saved.verifiedCheckIn
+        ? ReviewResult.savedVerified
+        : ReviewResult.savedUnverified;
   }
 }

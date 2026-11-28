@@ -1,3 +1,5 @@
+import 'package:latlong2/latlong.dart';
+
 import '../models/review.dart';
 import '../models/spot.dart';
 import 'dummy_data.dart';
@@ -25,8 +27,9 @@ class DummySpotRepository implements SpotRepository {
       ];
 
   @override
-  Future<void> addReview(Review review) async {
+  Future<Review> addReview(Review review, {LatLng? checkInLocation}) async {
     final saved = _storage.loadUserReviews()..add(review);
     await _storage.saveUserReviews(saved);
+    return review;
   }
 }

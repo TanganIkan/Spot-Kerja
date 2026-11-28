@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_theme.dart';
 
-/// Foto spot dari assets. Kalau foto tidak ada / gagal dimuat,
+/// Foto spot dari assets atau URL. Kalau foto tidak ada / gagal dimuat,
 /// tampilkan placeholder supaya layout tidak rusak.
 class SpotPhoto extends StatelessWidget {
   const SpotPhoto({
@@ -32,13 +32,23 @@ class SpotPhoto extends StatelessWidget {
       child: SizedBox(
         width: width,
         height: height,
-        child: path == null
-            ? placeholder
-            : Image.asset(
-                path!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => placeholder,
-              ),
+        child: switch (path) {
+          null => placeholder,
+          // Foto dari internet (misalnya Supabase Storage)
+          final url when url.startsWith('http') => Image.network(
+              url,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => placeholder,
+              loadingBuilder: (_, child, progress) =>
+                  progress == null ? child : placeholder,
+            ),
+          // Foto bawaan app (assets/)
+          final asset => Image.asset(
+              asset,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => placeholder,
+            ),
+        },
       ),
     );
   }

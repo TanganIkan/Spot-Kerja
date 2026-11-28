@@ -13,10 +13,11 @@ String timeAgo(DateTime time, [DateTime? now]) {
   return '${diff.inDays ~/ 30} bulan lalu';
 }
 
-String priceLabel(int level) => switch (level) {
+String priceLabel(int? level) => switch (level) {
       1 => '< 30rb',
       2 => '30–60rb',
-      _ => '> 60rb',
+      3 => '> 60rb',
+      _ => '–',
     };
 
 String scoreLabel(int score, {required bool hasData}) {

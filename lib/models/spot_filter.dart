@@ -61,7 +61,7 @@ class SpotFilter {
     if (manyOutlets && stats.power < FilterThresholds.goodRating) return false;
     if (quiet && stats.quiet < FilterThresholds.goodRating) return false;
     if (openLate && !spot.opensLate) return false;
-    if (openNow && !spot.isOpenAt(now)) return false;
+    if (openNow && spot.isOpenAt(now) != true) return false;
     final facts = stats.facts;
     if (smokeFree && !facts.hasSmokeFreeRoom) return false;
     if (airConditioned && !facts.hasAc) return false;

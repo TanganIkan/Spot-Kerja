@@ -5,6 +5,7 @@ import '../models/spot.dart';
 import '../models/spot_filter.dart';
 import '../state/spot_store.dart';
 import '../theme/app_theme.dart';
+import '../widgets/account_sheet.dart';
 import '../widgets/category_tabs.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/round_icon_button.dart';
@@ -66,6 +67,25 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         .toList()
       ..sort((a, b) =>
           store.statsFor(b.id).workScore.compareTo(store.statsFor(a.id).workScore));
+
+    // Database masih kosong (misalnya Supabase baru, data belum di-import).
+    if (store.allSpots.isEmpty) {
+      return ListView(
+        padding: const EdgeInsets.only(bottom: 24),
+        children: [
+          _Header(store: store),
+          const SizedBox(height: 48),
+          EmptyState(
+            icon: Icons.storefront_outlined,
+            title: 'Belum ada spot di sini',
+            message: 'Data tempat kerja di ${store.defaultAreaName} sedang '
+                'disiapkan. Coba lagi nanti.',
+            actionLabel: 'Muat ulang',
+            onAction: () => store.load(locate: false),
+          ),
+        ],
+      );
+    }
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
@@ -150,7 +170,7 @@ class _Header extends StatelessWidget {
                       child: Text(
                         store.hasRealLocation
                             ? 'Lokasimu saat ini'
-                            : '${SpotStore.defaultAreaName} (area contoh)',
+                            : store.defaultAreaName,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             fontSize: 13, color: AppColors.muted),
@@ -176,6 +196,8 @@ class _Header extends StatelessWidget {
             bordered: true,
             onPressed: store.isLocating ? null : store.refreshLocation,
           ),
+          const SizedBox(width: 8),
+          const AccountButton(),
         ],
       ),
     );

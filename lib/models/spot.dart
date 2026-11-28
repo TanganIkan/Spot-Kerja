@@ -22,17 +22,17 @@ class Spot {
     required this.area,
     required this.address,
     required this.location,
-    required this.openHour,
-    required this.closeHour,
-    required this.priceLevel,
     required this.category,
+    this.openHour,
+    this.closeHour,
+    this.priceLevel,
     this.photos = const [],
     this.description = '',
   });
 
   final SpotCategory category;
 
-  /// Path asset foto. Foto pertama dipakai sebagai cover.
+  /// Path asset atau URL foto. Foto pertama dipakai sebagai cover.
   final List<String> photos;
 
   String? get coverPhoto => photos.isEmpty ? null : photos.first;
@@ -45,27 +45,34 @@ class Spot {
   final String address;
   final LatLng location;
 
-  /// Jam buka (0–23).
-  final int openHour;
+  /// Jam buka (0–23). null = belum diketahui.
+  final int? openHour;
 
   /// Jam tutup (1–24). 24 berarti tutup tengah malam / buka 24 jam.
-  final int closeHour;
+  /// null = belum diketahui.
+  final int? closeHour;
 
-  /// 1 = hemat, 2 = sedang, 3 = premium.
-  final int priceLevel;
+  /// 1 = hemat, 2 = sedang, 3 = premium. null = belum diketahui.
+  final int? priceLevel;
   final String description;
 
-  bool isOpenAt(DateTime time) =>
-      time.hour >= openHour && time.hour < closeHour;
+  bool get hasHours => openHour != null && closeHour != null;
+
+  /// true = buka, false = tutup, null = jam buka belum diketahui.
+  bool? isOpenAt(DateTime time) {
+    if (!hasHours) return null;
+    return time.hour >= openHour! && time.hour < closeHour!;
+  }
 
   /// Masuk filter "Buka malam" kalau tutup jam 22.00 atau lebih.
-  bool get opensLate => closeHour >= 22;
+  bool get opensLate => (closeHour ?? 0) >= 22;
 
   bool get isOpen24Hours => openHour == 0 && closeHour == 24;
 
   String get hoursLabel {
+    if (!hasHours) return 'Jam buka belum diketahui';
     if (isOpen24Hours) return 'Buka 24 jam';
     String two(int h) => h.toString().padLeft(2, '0');
-    return '${two(openHour)}.00 – ${two(closeHour)}.00';
+    return '${two(openHour!)}.00 – ${two(closeHour!)}.00';
   }
 }

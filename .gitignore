@@ -49,3 +49,7 @@ app.*.map.json
 
 # Konfigurasi lokal Claude (preview server), tidak perlu di repo
 .claude/
+
+# Kunci Supabase: JANGAN di-commit (contohnya ada di env.example.json & .env.example)
+env.json
+.env

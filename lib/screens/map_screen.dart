@@ -56,7 +56,7 @@ class _MapScreenState extends State<MapScreen> {
       _mapController.move(_liftedCenter(store.userLocation, 15), 15);
     } else {
       _mapController.move(
-          _liftedCenter(SpotStore.defaultCenter, _initialZoom), _initialZoom);
+          _liftedCenter(store.defaultCenter, _initialZoom), _initialZoom);
       messenger.showSnackBar(const SnackBar(
         content: Text('Lokasi tidak tersedia. Menampilkan area contoh.'),
       ));
@@ -68,7 +68,7 @@ class _MapScreenState extends State<MapScreen> {
     final store = context.watch<SpotStore>();
     final spots = store.visibleSpots;
     final center =
-        store.hasRealLocation ? store.userLocation : SpotStore.defaultCenter;
+        store.hasRealLocation ? store.userLocation : store.defaultCenter;
 
     return Stack(
       children: [
@@ -76,7 +76,7 @@ class _MapScreenState extends State<MapScreen> {
           mapController: _mapController,
           options: MapOptions(
             initialCenter:
-                _liftedCenter(SpotStore.defaultCenter, _initialZoom),
+                _liftedCenter(store.defaultCenter, _initialZoom),
             initialZoom: _initialZoom,
           ),
           children: [
